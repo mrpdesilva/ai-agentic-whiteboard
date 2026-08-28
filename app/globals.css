@@ -1,4 +1,22 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  ── Token concept ──────────────────────────────────────────────
+  Primary:   Signal Violet   — the app-icon purple, used sparingly
+             as the "active agent" color.
+  Canvas:    Paper / Graphite — the whiteboard surface itself,
+             a warm-neutral off-white that never competes with
+             what's drawn on it.
+  Agents:    5 distinct hues (chart-1..5) act as a cursor/node
+             palette for multiple agents working the same board
+             at once — think Figma multiplayer cursors.
+  Signature: a soft dot-grid canvas background + an "agent-glow"
+             pulse for whichever node/agent currently has focus.
+  ------------------------------------------------------------- */
 
 @theme inline {
   --color-background: var(--background);
@@ -35,99 +53,216 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-agent-pulse: agent-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-dash-flow: dash-flow 1.2s linear infinite;
 
   @keyframes accordion-down {
-    from {
-      height: 0;
-    }
-    to {
-      height: var(--radix-accordion-content-height);
-    }
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
   }
   @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height);
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+  @keyframes agent-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent);
     }
-    to {
-      height: 0;
+    50% {
+      box-shadow: 0 0 0 8px color-mix(in oklch, var(--primary) 0%, transparent);
     }
   }
+  @keyframes dash-flow {
+    to { stroke-dashoffset: -20; }
+  }
+
+  --font-heading: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(240 10% 3.9%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
-  --primary: hsl(240 5.9% 10%);
-  --primary-foreground: hsl(0 0% 98%);
-  --secondary: hsl(240 4.8% 95.9%);
-  --secondary-foreground: hsl(240 5.9% 10%);
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  --accent: hsl(240 4.8% 95.9%);
-  --accent-foreground: hsl(240 5.9% 10%);
-  --destructive: hsl(0 84.2% 60.2%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 5.9% 90%);
-  --input: hsl(240 5.9% 90%);
-  --ring: hsl(240 10% 3.9%);
-  --radius: 0.5rem;
+  /* Canvas surface */
+  --background: oklch(0.985 0.004 292);
+  --foreground: oklch(0.18 0.025 292);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.025 292);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.025 292);
+
+  /* Signal Violet — the icon color, used for the active agent / primary CTA */
+  --primary: oklch(0.62 0.235 293);
+  --primary-foreground: oklch(0.98 0.01 293);
+
+  --secondary: oklch(0.945 0.02 293);
+  --secondary-foreground: oklch(0.32 0.09 293);
+
+  --muted: oklch(0.96 0.008 292);
+  --muted-foreground: oklch(0.52 0.02 292);
+
+  /* Agent Teal — secondary accent for links, focus states, "connected" chips */
+  --accent: oklch(0.76 0.13 185);
+  --accent-foreground: oklch(0.18 0.05 185);
+
+  --destructive: oklch(0.62 0.22 22);
+  --destructive-foreground: oklch(0.98 0.01 22);
+
+  --border: oklch(0.91 0.008 292);
+  --input: oklch(0.91 0.008 292);
+  --ring: oklch(0.62 0.235 293 / 0.55);
+
+  --radius: 0.75rem;
+
+  /* Multi-agent palette — used for cursors, node accents, avatars */
+  --chart-1: oklch(0.62 0.235 293); /* violet   — agent 1 */
+  --chart-2: oklch(0.76 0.13 185);  /* teal     — agent 2 */
+  --chart-3: oklch(0.78 0.15 70);   /* amber    — agent 3 */
+  --chart-4: oklch(0.68 0.19 18);   /* rose     — agent 4 */
+  --chart-5: oklch(0.7 0.15 255);   /* blue     — agent 5 */
+
+  --sidebar: oklch(0.975 0.006 292);
+  --sidebar-foreground: oklch(0.18 0.025 292);
+  --sidebar-primary: oklch(0.62 0.235 293);
+  --sidebar-primary-foreground: oklch(0.98 0.01 293);
+  --sidebar-accent: oklch(0.945 0.02 293);
+  --sidebar-accent-foreground: oklch(0.32 0.09 293);
+  --sidebar-border: oklch(0.91 0.008 292);
+  --sidebar-ring: oklch(0.62 0.235 293 / 0.55);
+
+  /* Whiteboard dot grid */
+  --canvas-dot-color: oklch(0.82 0.01 292);
+  --canvas-dot-size: 1.5px;
+  --canvas-grid-gap: 24px;
+
+  --font-sans: "Instrument Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
 .dark {
-  --background: hsl(240 10% 3.9%);
-  --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 3.9%);
-  --card-foreground: hsl(0 0% 98%);
-  --popover: hsl(240 10% 3.9%);
-  --popover-foreground: hsl(0 0% 98%);
-  --primary: hsl(0 0% 98%);
-  --primary-foreground: hsl(240 5.9% 10%);
-  --secondary: hsl(240 3.7% 15.9%);
-  --secondary-foreground: hsl(0 0% 98%);
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  --accent: hsl(240 3.7% 15.9%);
-  --accent-foreground: hsl(0 0% 98%);
-  --destructive: hsl(0 62.8% 30.6%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(240 4.9% 83.9%);
+  --background: oklch(0.16 0.018 292);
+  --foreground: oklch(0.96 0.006 292);
+
+  --card: oklch(0.205 0.02 292);
+  --card-foreground: oklch(0.96 0.006 292);
+  --popover: oklch(0.205 0.02 292);
+  --popover-foreground: oklch(0.96 0.006 292);
+
+  --primary: oklch(0.72 0.2 293);
+  --primary-foreground: oklch(0.14 0.02 293);
+
+  --secondary: oklch(0.27 0.03 293);
+  --secondary-foreground: oklch(0.92 0.02 293);
+
+  --muted: oklch(0.24 0.015 292);
+  --muted-foreground: oklch(0.66 0.015 292);
+
+  --accent: oklch(0.7 0.12 185);
+  --accent-foreground: oklch(0.14 0.03 185);
+
+  --destructive: oklch(0.68 0.2 22);
+  --destructive-foreground: oklch(0.14 0.02 22);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.2 293 / 0.55);
+
+  --chart-1: oklch(0.72 0.2 293);
+  --chart-2: oklch(0.7 0.12 185);
+  --chart-3: oklch(0.78 0.14 70);
+  --chart-4: oklch(0.7 0.17 18);
+  --chart-5: oklch(0.72 0.14 255);
+
+  --sidebar: oklch(0.19 0.02 292);
+  --sidebar-foreground: oklch(0.96 0.006 292);
+  --sidebar-primary: oklch(0.72 0.2 293);
+  --sidebar-primary-foreground: oklch(0.14 0.02 293);
+  --sidebar-accent: oklch(0.27 0.03 293);
+  --sidebar-accent-foreground: oklch(0.92 0.02 293);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.72 0.2 293 / 0.55);
+
+  --canvas-dot-color: oklch(1 0 0 / 8%);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: hsl(240 10% 3.9%);
-    --foreground: hsl(0 0% 98%);
-    --card: hsl(240 10% 3.9%);
-    --card-foreground: hsl(0 0% 98%);
-    --popover: hsl(240 10% 3.9%);
-    --popover-foreground: hsl(0 0% 98%);
-    --primary: hsl(0 0% 98%);
-    --primary-foreground: hsl(240 5.9% 10%);
-    --secondary: hsl(240 3.7% 15.9%);
-    --secondary-foreground: hsl(0 0% 98%);
-    --muted: hsl(240 3.7% 15.9%);
-    --muted-foreground: hsl(240 5% 64.9%);
-    --accent: hsl(240 3.7% 15.9%);
-    --accent-foreground: hsl(0 0% 98%);
-    --destructive: hsl(0 62.8% 30.6%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(240 3.7% 15.9%);
-    --input: hsl(240 3.7% 15.9%);
-    --ring: hsl(240 4.9% 83.9%);
+  :root:not(.light) {
+    --background: oklch(0.16 0.018 292);
+    --foreground: oklch(0.96 0.006 292);
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ── Whiteboard-specific utilities ──────────────────────────── */
+@layer components {
+  /* Infinite-canvas dot grid — put this on your board/stage container */
+  .canvas-grid {
+    background-image: radial-gradient(
+      var(--canvas-dot-color) var(--canvas-dot-size),
+      transparent var(--canvas-dot-size)
+    );
+    background-size: var(--canvas-grid-gap) var(--canvas-grid-gap);
+    background-position: -1px -1px;
+  }
+
+  /* Wraps an active/selected agent node — pulses in the primary hue */
+  .agent-glow {
+    animation: var(--animate-agent-pulse);
+  }
+
+  /* "Agent is thinking" indicator — pairs well with three animated dots */
+  .agent-thinking {
+    @apply text-muted-foreground;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+
+  /* Animated dashed connector between nodes (apply to an SVG <path>) */
+  .node-connector {
+    stroke-dasharray: 6 6;
+    animation: var(--animate-dash-flow);
+  }
+
+  /* Per-agent color assignment helpers, e.g. <div class="agent-color-2"> */
+  .agent-color-1 { color: var(--chart-1); }
+  .agent-color-2 { color: var(--chart-2); }
+  .agent-color-3 { color: var(--chart-3); }
+  .agent-color-4 { color: var(--chart-4); }
+  .agent-color-5 { color: var(--chart-5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-glow,
+  .node-connector {
+    animation: none;
   }
 }
