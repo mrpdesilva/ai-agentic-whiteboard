@@ -75,9 +75,19 @@ export function AppSidebar() {
         </div>
 
         <div className="flex items-center gap-2 p-4 border rounded-md">
-          <Image src={user?.user?.imageUrl ?? ''} alt="Logo" width={40} height={40}
-            className="rounded-full"
-          />
+          {user?.user?.imageUrl ? (
+            <Image
+              src={user.user.imageUrl}
+              alt="Logo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium">
+              {user?.user?.firstName?.[0] || "U"}
+            </div>
+          )}
           <h2>{user?.user?.firstName} {user?.user?.lastName}</h2>
         </div>
       </SidebarFooter>

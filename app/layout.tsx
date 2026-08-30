@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Provider from './provider';
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -21,7 +22,14 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning className={cn("font-sans", inter.variable)}>
         <body style={{ margin: 0, padding: 0 }}>
-          <Provider>{children}</Provider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <Provider>{children}</Provider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
