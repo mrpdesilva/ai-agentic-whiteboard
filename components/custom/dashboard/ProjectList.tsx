@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Folder } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react'
+import CreateNewBoardDialog from './CreateNewBoardDialog';
 
 const ProjectList = () => {
 
@@ -17,7 +18,7 @@ const ProjectList = () => {
           <Image src="/open-folder.svg" alt="Folder" height={90} width={90} />
           <h2 className='text-2xl font-bold'>No Boards Found</h2>
           <p className='text-muted-foreground'>Create your first board to start brainstorming & planning !</p>
-          <Button>+ Create New Board</Button>
+          <CreateNewBoardDialog/>
         </div>
 
       ) : <div>
