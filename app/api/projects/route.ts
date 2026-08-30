@@ -6,6 +6,10 @@ export async function POST(req: NextRequest) {
     const { projectId, projectName } = await req.json();
     const user = await currentUser();
 
+    if(!user?.primaryEmailAddress?.emailAddress) {
+        return new Response(JSON.stringify({ error: "Unauthourized User" }));
+    }
+
     if (!projectId || !projectName) {
         return new Response(JSON.stringify({ error: "Project Information Missing" }));
     }
