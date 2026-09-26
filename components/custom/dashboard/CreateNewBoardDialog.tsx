@@ -59,7 +59,7 @@ function CreateNewBoardDialog() {
 
     return (
         <Dialog open={dialog} onOpenChange={setDialog}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 <Button className="w-full">
                     <Plus /> Create New Board
                 </Button>
